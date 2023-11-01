@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import { RoomForm } from "./components";
+import { RoomForm, RoomPage } from "./components";
 
 function App() {
   fetch("/api/room")
@@ -8,12 +8,14 @@ function App() {
     .then((data) => console.log(data));
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<RoomForm />} />
-        <Route path="/room" element={<div>Room</div>} />
-      </Routes>
-    </Router>
+    <div className="flex justify-center items-center h-screen">
+      <Router>
+        <Routes>
+          <Route path="/" element={<RoomForm />} />
+          <Route path="/room" element={<RoomPage />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 
