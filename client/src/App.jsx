@@ -1,3 +1,5 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import { RoomForm } from "./components";
 
 function App() {
@@ -6,9 +8,12 @@ function App() {
     .then((data) => console.log(data));
 
   return (
-    <>
-      <RoomForm />
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<RoomForm />} />
+        <Route path="/room" element={<div>Room</div>} />
+      </Routes>
+    </Router>
   );
 }
 
