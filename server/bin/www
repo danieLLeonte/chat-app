@@ -4,9 +4,12 @@
  * Module dependencies.
  */
 
+const { Server } = require("socket.io");
 var app = require("../app");
 var debug = require("debug")("server:server");
 var http = require("http");
+
+const { socketUtils } = require("../utils/socket");
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +23,17 @@ app.set("port", port);
  */
 
 var server = http.createServer(app);
+
+/**
+ * Create Socket server.
+ */
+const io = new Server({
+  cors: {
+    origin: "http://localhost:5173",
+  },
+});
+io.listen(server);
+socketUtils(io);
 
 /**
  * Listen on provided port, on all network interfaces.
