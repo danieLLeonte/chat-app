@@ -8,7 +8,7 @@ const RoomPage = () => {
   const username = query.get("username");
   const room = query.get("room");
 
-  const [users, setUsers] = useState([username]);
+  const [users, setUsers] = useState([]);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
 
@@ -20,13 +20,22 @@ const RoomPage = () => {
   };
 
   useEffect(() => {
-    socket.emit("join-room", room);
+    socket.emit("join-room", room, username);
+    socket.on("allUsers-joined", (allUsers) => {
+      setUsers(allUsers);
+    });
     socket.on("receive-message", (recMessage) => {
       setMessages((prev) => [...prev, recMessage]);
     });
+    // socket.on("leave-room", (allUsers) => {
+    //   setUsers(allUsers);
+    // });
 
+    console.log(socket.room);
     return () => {
+      socket.off("allUsers-joined");
       socket.off("receive-message");
+      // socket.off("leave-room");
     };
   }, []);
 
