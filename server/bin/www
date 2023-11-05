@@ -9,7 +9,9 @@ var app = require("../app");
 var debug = require("debug")("server:server");
 var http = require("http");
 var dotenv = require("dotenv");
+var cors = require("cors");
 
+app.use(cors());
 const { socketUtils } = require("../utils/socket");
 
 dotenv.config();
