@@ -14,9 +14,9 @@ const RoomPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    socket.emit("send-message", message, room);
+    socket.emit("send-message", { username, message }, room);
     setMessage("");
-    setMessages((prev) => [...prev, message]);
+    setMessages((prev) => [...prev, { username, message }]);
   };
 
   useEffect(() => {
@@ -27,15 +27,10 @@ const RoomPage = () => {
     socket.on("receive-message", (recMessage) => {
       setMessages((prev) => [...prev, recMessage]);
     });
-    // socket.on("leave-room", (allUsers) => {
-    //   setUsers(allUsers);
-    // });
 
-    console.log(socket.room);
     return () => {
       socket.off("allUsers-joined");
       socket.off("receive-message");
-      // socket.off("leave-room");
     };
   }, []);
 
@@ -53,8 +48,10 @@ const RoomPage = () => {
         <h3 className="text-2xl font-bold">Connected in room {room}</h3>
         <div className="bg-white h-full w-full flex flex-col justify-between rounded-lg py-2 px-4">
           <div className="flex flex-col gap-4 h-full overflow-y-auto">
-            {messages.map((message, index) => (
-              <p key={message + index}>{message}</p>
+            {messages.map(({ username, message }, index) => (
+              <p key={message + index}>
+                {username}: {message}
+              </p>
             ))}
           </div>
           <div className="flex justify-between items-center gap-4">

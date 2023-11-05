@@ -2,41 +2,29 @@ const users = {};
 
 function socketUtils(io) {
   io.on("connection", (socket) => {
-    socket.on("join-room", (room, username) => {
-      socket.join(room);
-      if (!users[room]) {
-        const map = new Map();
-        users[room] = map;
-      }
-      if (!users[room].has(socket.id)) {
-        users[room].set(socket.id, username);
-      }
-      // Emit an event to inform the room that a new user has joined
-      io.in(room).emit("user-joined", username);
+    function updateAndEmitUserList(room) {
       const names = Array.from(users[room].values());
       io.in(room).emit("allUsers-joined", names);
+    }
+
+    socket.on("join-room", (room, username) => {
+      socket.join(room);
+      users[room] = users[room] || new Map();
+      users[room].set(socket.id, username);
+
+      updateAndEmitUserList(room);
     });
 
-    socket.on("send-message", (message, room) => {
-      console.log(users);
-      socket.to(room).emit("receive-message", message);
+    socket.on("send-message", ({ username, message }, room) => {
+      socket.to(room).emit("receive-message", { username, message });
     });
 
     socket.on("disconnect", () => {
-      console.log(users);
-
-      let leavedRoom;
-      for (const room in users) {
-        if (users[room].has(socket.id)) {
-          users[room].delete(socket.id);
-          leavedRoom = room;
-          break;
+      Object.entries(users).forEach(([room, userMap]) => {
+        if (userMap.delete(socket.id)) {
+          updateAndEmitUserList(room);
         }
-      }
-      if (users[leavedRoom]) {
-        const names = Array.from(users[leavedRoom].values());
-        io.in(leavedRoom).emit("allUsers-joined", names);
-      }
+      });
     });
   });
 }
