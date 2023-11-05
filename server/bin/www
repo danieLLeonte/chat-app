@@ -38,7 +38,7 @@ var server = http.createServer(app);
  */
 const io = new Server({
   cors: {
-    origin: CLIENT_URL,
+    origin: "*",
   },
 });
 io.listen(server);
