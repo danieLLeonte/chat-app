@@ -1,4 +1,5 @@
 const users = {};
+const messages = {};
 
 function socketUtils(io) {
   io.on("connection", (socket) => {
@@ -16,13 +17,24 @@ function socketUtils(io) {
     });
 
     socket.on("send-message", ({ username, message }, room) => {
+      messages[room] = messages[room] || [];
+      messages[room].push({ username, message });
       socket.to(room).emit("receive-message", { username, message });
+    });
+
+    socket.on("get-all-messages", (room) => {
+      if (messages[room]) {
+        socket.nsp.to(room).emit("get-all-messages", messages[room]);
+      }
     });
 
     socket.on("disconnect", () => {
       Object.entries(users).forEach(([room, userMap]) => {
         if (userMap.delete(socket.id)) {
           updateAndEmitUserList(room);
+          if (users[room].size === 0) {
+            messages[room] = [];
+          }
         }
       });
     });

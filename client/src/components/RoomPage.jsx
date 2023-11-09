@@ -25,12 +25,17 @@ const RoomPage = () => {
     socket.on("allUsers-joined", (allUsers) => {
       setUsers(allUsers);
     });
+    socket.emit("get-all-messages", room);
+    socket.on("get-all-messages", (allMessages) => {
+      setMessages(allMessages);
+    });
     socket.on("receive-message", (recMessage) => {
       setMessages((prev) => [...prev, recMessage]);
     });
 
     return () => {
       socket.off("allUsers-joined");
+      socket.off("get-all-messages");
       socket.off("receive-message");
     };
   }, []);
